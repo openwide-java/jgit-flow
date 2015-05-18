@@ -99,14 +99,13 @@ public abstract class AbstractGitFlowCommand<C, T> implements Callable<T>, JGitF
                         reporter.infoText(getCommandName(), "messages: '" + pr.getMessages() + "'");
 
                         for(RemoteRefUpdate update : pr.getRemoteUpdates()) {
-                            if (update.hasTrackingRefUpdate()) {
-                                RefUpdate.Result trackingResult = update.getTrackingRefUpdate().getResult();
-                                if (failedResult(trackingResult)) {
-                                    if (pr.getMessages() != null && pr.getMessages().length() > 0) {
-                                        throw new JGitFlowGitAPIException("error pushing to " + branchToPush + " - status: " + trackingResult.name() + " - " + pr.getMessages());
-                                    } else {
-                                        throw new JGitFlowGitAPIException("error pushing to " + branchToPush + " - " + trackingResult.name());
-                                    }
+
+                            RemoteRefUpdate.Status trackingStatus = update.getStatus();
+                            if (failedResult(trackingStatus)) {
+                                if (pr.getMessages() != null && pr.getMessages().length() > 0) {
+                                    throw new JGitFlowGitAPIException("error pushing to " + branchToPush + " - status: " + trackingStatus.name() + " - " + pr.getMessages());
+                                } else {
+                                    throw new JGitFlowGitAPIException("error pushing to " + branchToPush + " - " + trackingStatus.name());
                                 }
                             }
                         }
@@ -127,15 +126,15 @@ public abstract class AbstractGitFlowCommand<C, T> implements Callable<T>, JGitF
         }
     }
 
-    private boolean failedResult(RefUpdate.Result trackingResult) {
+    private boolean failedResult(RemoteRefUpdate.Status trackingStatus) {
         boolean isFailed = false;
         
-        switch(trackingResult)
+        switch(trackingStatus)
         {
-            case LOCK_FAILURE:
-            case REJECTED:
-            case REJECTED_CURRENT_BRANCH:
-            case IO_FAILURE:
+            case REJECTED_NONFASTFORWARD:
+            case REJECTED_NODELETE:
+            case REJECTED_REMOTE_CHANGED:
+            case REJECTED_OTHER_REASON:
                 isFailed = true;
                 break;
         }
