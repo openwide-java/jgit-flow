@@ -412,6 +412,90 @@ public class ReleaseManagerStartReleaseTest extends AbstractFlowManagerTest
     }
 
     @Test
+    public void releaseWith3DigitVersionIncrementDefault() throws Exception
+    {
+        String projectName = "3-digit-version-increment-default";
+        List<MavenProject> projects = createReactorProjects("rewrite-for-release", projectName);
+        File projectRoot = projects.get(0).getBasedir();
+
+        ReleaseContext ctx = new ReleaseContext(projectRoot);
+
+        ctx.setInteractive(false)
+           .setNoTag(true)
+           .setAllowSnapshots(true);
+
+        basicReleaseRewriteTest(projectName, ctx);
+    }
+
+    @Test
+    public void releaseWith3DigitVersionIncrementMajor() throws Exception
+    {
+        String projectName = "3-digit-version-increment-major";
+        List<MavenProject> projects = createReactorProjects("rewrite-for-release", projectName);
+        File projectRoot = projects.get(0).getBasedir();
+
+        ReleaseContext ctx = new ReleaseContext(projectRoot);
+
+        ctx.setInteractive(false)
+           .setNoTag(true)
+           .setAllowSnapshots(true)
+           .setVersionNumberToIncrement("0");
+
+        basicReleaseRewriteTest(projectName, ctx);
+    }
+
+    @Test
+    public void releaseWith3DigitVersionIncrementMinor() throws Exception
+    {
+        String projectName = "3-digit-version-increment-minor";
+        List<MavenProject> projects = createReactorProjects("rewrite-for-release", projectName);
+        File projectRoot = projects.get(0).getBasedir();
+
+        ReleaseContext ctx = new ReleaseContext(projectRoot);
+
+        ctx.setInteractive(false)
+           .setNoTag(true)
+           .setAllowSnapshots(true)
+           .setVersionNumberToIncrement("1");
+
+        basicReleaseRewriteTest(projectName, ctx);
+    }
+
+    @Test
+    public void releaseWithComplexVersionIncrementMajor() throws Exception
+    {
+        String projectName = "complex-version-and-suffix-increment-major";
+        List<MavenProject> projects = createReactorProjects("rewrite-for-release", projectName);
+        File projectRoot = projects.get(0).getBasedir();
+
+        ReleaseContext ctx = new ReleaseContext(projectRoot);
+
+        ctx.setInteractive(false)
+           .setNoTag(true)
+           .setAllowSnapshots(true)
+           .setVersionNumberToIncrement("0");
+
+        basicReleaseRewriteTest(projectName, ctx);
+    }
+
+    @Test
+    public void releaseWithComplexVersionIncrementMinor() throws Exception
+    {
+        String projectName = "complex-version-and-suffix-increment-minor";
+        List<MavenProject> projects = createReactorProjects("rewrite-for-release", projectName);
+        File projectRoot = projects.get(0).getBasedir();
+
+        ReleaseContext ctx = new ReleaseContext(projectRoot);
+
+        ctx.setInteractive(false)
+           .setNoTag(true)
+           .setAllowSnapshots(true)
+           .setVersionNumberToIncrement("1");
+
+        basicReleaseRewriteTest(projectName, ctx);
+    }
+
+    @Test
     public void releaseWithReleasedParent() throws Exception
     {
         basicReleaseRewriteTest("pom-with-released-parent");

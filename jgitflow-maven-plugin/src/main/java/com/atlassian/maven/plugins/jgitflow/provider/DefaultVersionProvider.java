@@ -338,10 +338,10 @@ public class DefaultVersionProvider extends AbstractLogEnabled implements Versio
     {
         ReleaseContext ctx = contextProvider.getContext();
         String suggestedVersion = "unknown";
-        DefaultVersionInfo info;
+        HotfixVersionInfo info;
         try
         {
-            info = new DefaultVersionInfo(incomingVersion);
+            info = new HotfixVersionInfo(incomingVersion);
         }
         catch (VersionParseException e)
         {
@@ -349,7 +349,7 @@ public class DefaultVersionProvider extends AbstractLogEnabled implements Versio
             {
                 try
                 {
-                    info = new DefaultVersionInfo("1.0");
+                    info = new HotfixVersionInfo("1.0");
                 }
                 catch (VersionParseException e1)
                 {
@@ -368,7 +368,8 @@ public class DefaultVersionProvider extends AbstractLogEnabled implements Versio
         }
         else if (VersionType.DEVELOPMENT.equals(versionType))
         {
-            suggestedVersion = info.getNextVersion().getSnapshotVersionString();
+            int versionNumberToIncrement = StringUtils.isBlank(ctx.getVersionNumberToIncrement()) ? 2 : Integer.parseInt(ctx.getVersionNumberToIncrement());
+			suggestedVersion = info.getNextDevelopmentVersion(versionNumberToIncrement).getSnapshotVersionString();
         }
 
         return suggestedVersion;

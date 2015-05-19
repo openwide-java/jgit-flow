@@ -34,6 +34,7 @@ public class ReleaseContext
     private String tagMessage;
     private String defaultReleaseVersion;
     private String defaultDevelopmentVersion;
+    private String versionNumberToIncrement;
     private String defaultFeatureName;
     private String releaseBranchVersionSuffix;
     private InitContext flowInitContext;
@@ -66,6 +67,7 @@ public class ReleaseContext
         this.allowSnapshots = false;
         this.defaultReleaseVersion = null;
         this.defaultDevelopmentVersion = null;
+        this.versionNumberToIncrement = null;
         this.interactive = true;
         this.autoVersionSubmodules = false;
         this.updateDependencies = true;
@@ -140,7 +142,16 @@ public class ReleaseContext
         return this;
     }
 
-    public boolean isInteractive()
+    public String getVersionNumberToIncrement() {
+		return versionNumberToIncrement;
+	}
+
+	public ReleaseContext setVersionNumberToIncrement(String versionNumberToIncrement) {
+		this.versionNumberToIncrement = versionNumberToIncrement;
+		return this;
+	}
+
+	public boolean isInteractive()
     {
         return interactive;
     }

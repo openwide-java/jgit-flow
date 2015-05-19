@@ -20,3 +20,6 @@ dependency-reduced-pom.xml
 data
 apps
 build-number.txt
+.classpath
+*.project
+.settings

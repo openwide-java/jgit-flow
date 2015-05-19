@@ -39,6 +39,8 @@ import org.apache.maven.shared.release.versions.VersionInfo;
 import org.apache.maven.shared.release.versions.VersionParseException;
 import org.codehaus.plexus.util.StringUtils;
 
+// TODO: Needs to be renamed to something generic since it is being used
+//  next development version as well.
 public class HotfixVersionInfo implements VersionInfo
 {
     private final String strVersion;
@@ -343,6 +345,46 @@ public class HotfixVersionInfo implements VersionInfo
 
         return version.getReleaseVersionString();
     }
+
+    public VersionInfo getNextDevelopmentVersion(int indexOfDigitsToIncrement)
+    {
+        HotfixVersionInfo version = null;
+        if (digits != null)
+        {
+            List<String> digits = new ArrayList<String>(this.digits);
+            String annotationRevision = this.annotationRevision;
+            if (indexOfDigitsToIncrement == 0)
+            {
+        		int newMajorVersion = Integer.parseInt(digits.get(0)) + 1;
+        		digits.set(0, String.valueOf(newMajorVersion));
+        		rebase(digits, 1);
+            }
+            else if (indexOfDigitsToIncrement == 1)
+            {
+        		int newMinorVersion = Integer.parseInt(digits.get(1)) + 1;
+        		digits.set(1, String.valueOf(newMinorVersion));
+        		rebase(digits, 2);
+            }
+            else if ( StringUtils.isNumeric( annotationRevision ) )
+            {
+                annotationRevision = incrementVersionString( annotationRevision );
+            }
+            else
+            {
+                digits.set(digits.size() - 1, incrementVersionString((String) digits.get(digits.size() - 1)));
+            }
+
+            version = new HotfixVersionInfo(digits, annotation, annotationRevision, buildSpecifier,
+                    annotationSeparator, annotationRevSeparator, buildSeparator);
+        }
+        return version;
+    }
+
+	private void rebase(List<String> digits, int rebaseStartIndex) {
+		for (int i = rebaseStartIndex; i < digits.size(); i++) {
+			digits.set(i, "0");
+		}
+	}
 
     //if starting at 1.1, returns 1.0.1
     public String getDecrementedHotfixVersionString()
