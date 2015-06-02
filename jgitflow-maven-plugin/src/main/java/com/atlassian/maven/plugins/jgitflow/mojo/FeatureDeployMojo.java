@@ -24,7 +24,7 @@ public class FeatureDeployMojo extends AbstractJGitFlowMojo
     private String featureName = "";
 
     /**
-     * The space-separated list of gaols to run when doing a maven deploy
+     * The space-separated list of goals to run when doing a maven deploy
      */
     @Parameter(property = "goals", defaultValue = "")
     private String goals = "";
