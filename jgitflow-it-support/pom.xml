@@ -3,7 +3,7 @@
     <parent>
         <artifactId>jgitflow-parent</artifactId>
         <groupId>external.atlassian.jgitflow</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0-mjf_235_lburton_buildnumbergoal_cope_with_detached_head-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
