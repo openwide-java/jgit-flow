@@ -190,11 +190,14 @@ public class GitHelper
             List<Ref> refs = git.branchList().setListMode(null).call();
             for (Ref ref : refs)
             {
-                String simpleName = ref.getName().substring(ref.getName().indexOf(Constants.R_HEADS) + Constants.R_HEADS.length());
-                if (simpleName.equals(branchName))
+                if (ref.getName().contains(Constants.R_HEADS))
                 {
-                    exists = true;
-                    break;
+                    String simpleName = ref.getName().substring(ref.getName().indexOf(Constants.R_HEADS) + Constants.R_HEADS.length());
+                    if (simpleName.equals(branchName))
+                    {
+                        exists = true;
+                        break;
+                    }
                 }
             }
 
