@@ -90,7 +90,7 @@ public class HotfixFinishMojo extends AbstractJGitFlowMojo
     private String tagMessage = "";
 
     /**
-     * The space-separated list of gaols to run when doing a maven deploy
+     * The space-separated list of goals to run when doing a maven deploy
      */
     @Parameter(property = "goals", defaultValue = "clean deploy")
     private String goals = "";
