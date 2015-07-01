@@ -2,7 +2,8 @@ package org.apache.maven.shared.release.version;
 
 /*
  * This is a modified version of DefaultVersionInfo from the maven-release-manager
- * project that adds support for creating hotfix versions
+ * project that adds support for creating versions based on plug-in specific configuration 
+ * and the versioning scheme in use by the actual project.
  * The original license is as follows:
  */
 
@@ -39,9 +40,7 @@ import org.apache.maven.shared.release.versions.VersionInfo;
 import org.apache.maven.shared.release.versions.VersionParseException;
 import org.codehaus.plexus.util.StringUtils;
 
-// TODO: Needs to be renamed to something generic since it is being used
-//  next development version as well.
-public class HotfixVersionInfo implements VersionInfo
+public class JGitFlowVersionInfo implements VersionInfo
 {
     private final String strVersion;
 
@@ -103,7 +102,7 @@ public class HotfixVersionInfo implements VersionInfo
      *
      * @param version
      */
-    public HotfixVersionInfo(String version)
+    public JGitFlowVersionInfo(String version)
             throws VersionParseException
     {
         strVersion = version;
@@ -158,7 +157,7 @@ public class HotfixVersionInfo implements VersionInfo
         }
     }
 
-    public HotfixVersionInfo(List<String> digits, String annotation, String annotationRevision, String buildSpecifier,
+    public JGitFlowVersionInfo(List<String> digits, String annotation, String annotationRevision, String buildSpecifier,
                              String annotationSeparator, String annotationRevSeparator, String buildSeparator)
     {
         this.digits = digits;
@@ -178,7 +177,7 @@ public class HotfixVersionInfo implements VersionInfo
 
     public VersionInfo getNextVersion()
     {
-        HotfixVersionInfo version = null;
+        JGitFlowVersionInfo version = null;
         if (digits != null)
         {
             List<String> digits = new ArrayList<String>(this.digits);
@@ -192,14 +191,14 @@ public class HotfixVersionInfo implements VersionInfo
                 digits.set(digits.size() - 1, incrementVersionString((String) digits.get(digits.size() - 1)));
             }
 
-            version = new HotfixVersionInfo(digits, annotation, annotationRevision, buildSpecifier,
+            version = new JGitFlowVersionInfo(digits, annotation, annotationRevision, buildSpecifier,
                     annotationSeparator, annotationRevSeparator, buildSeparator);
         }
         return version;
     }
 
     /**
-     * Compares this {@link HotfixVersionInfo} to the supplied {@link HotfixVersionInfo}
+     * Compares this {@link JGitFlowVersionInfo} to the supplied {@link JGitFlowVersionInfo}
      * to determine which version is greater.
      *
      * @param obj the comparison version
@@ -208,7 +207,7 @@ public class HotfixVersionInfo implements VersionInfo
      */
     public int compareTo(VersionInfo obj)
     {
-        HotfixVersionInfo that = (HotfixVersionInfo) obj;
+        JGitFlowVersionInfo that = (JGitFlowVersionInfo) obj;
 
         int result;
         // TODO: this is a workaround for a bug in DefaultArtifactVersion - fix there - 1.01 < 1.01.01
@@ -236,7 +235,7 @@ public class HotfixVersionInfo implements VersionInfo
 
     public boolean equals(Object obj)
     {
-        if (!(obj instanceof HotfixVersionInfo))
+        if (!(obj instanceof JGitFlowVersionInfo))
         {
             return false;
         }
@@ -303,7 +302,7 @@ public class HotfixVersionInfo implements VersionInfo
     //if starting at 1.1, returns 1.1.1
     public String getHotfixVersionString()
     {
-        HotfixVersionInfo version = null;
+        JGitFlowVersionInfo version = null;
         if (digits != null)
         {
             List<String> digits = new ArrayList<String>(this.digits);
@@ -340,7 +339,7 @@ public class HotfixVersionInfo implements VersionInfo
                 digits.add("hotfix");
             }
 
-            version = new HotfixVersionInfo(digits, annotation, annotationRevision, buildSpecifier, annotationSeparator, annotationRevSeparator, buildSeparator);
+            version = new JGitFlowVersionInfo(digits, annotation, annotationRevision, buildSpecifier, annotationSeparator, annotationRevSeparator, buildSeparator);
         }
 
         return version.getReleaseVersionString();
@@ -348,7 +347,7 @@ public class HotfixVersionInfo implements VersionInfo
 
     public VersionInfo getNextDevelopmentVersion(int indexOfDigitsToIncrement)
     {
-        HotfixVersionInfo version = null;
+        JGitFlowVersionInfo version = null;
         if (digits != null)
         {
             List<String> digits = new ArrayList<String>(this.digits);
@@ -374,7 +373,7 @@ public class HotfixVersionInfo implements VersionInfo
                 digits.set(digits.size() - 1, incrementVersionString((String) digits.get(digits.size() - 1)));
             }
 
-            version = new HotfixVersionInfo(digits, annotation, annotationRevision, buildSpecifier,
+            version = new JGitFlowVersionInfo(digits, annotation, annotationRevision, buildSpecifier,
                     annotationSeparator, annotationRevSeparator, buildSeparator);
         }
         return version;
@@ -389,7 +388,7 @@ public class HotfixVersionInfo implements VersionInfo
     //if starting at 1.1, returns 1.0.1
     public String getDecrementedHotfixVersionString()
     {
-        HotfixVersionInfo version = null;
+        JGitFlowVersionInfo version = null;
         if (digits != null)
         {
             List<String> digits = new ArrayList<String>(this.digits);
@@ -407,7 +406,7 @@ public class HotfixVersionInfo implements VersionInfo
                 digits.set(digits.size() - 1, "1");
             }
 
-            version = new HotfixVersionInfo(digits, annotation, annotationRevision, buildSpecifier, annotationSeparator, annotationRevSeparator, buildSeparator);
+            version = new JGitFlowVersionInfo(digits, annotation, annotationRevision, buildSpecifier, annotationSeparator, annotationRevSeparator, buildSeparator);
         }
         return version.getReleaseVersionString();
     }
@@ -417,7 +416,7 @@ public class HotfixVersionInfo implements VersionInfo
         return strVersion;
     }
 
-    protected static String getVersionString(HotfixVersionInfo info, String buildSpecifier, String buildSeparator)
+    protected static String getVersionString(JGitFlowVersionInfo info, String buildSpecifier, String buildSeparator)
     {
         StringBuilder sb = new StringBuilder();
 

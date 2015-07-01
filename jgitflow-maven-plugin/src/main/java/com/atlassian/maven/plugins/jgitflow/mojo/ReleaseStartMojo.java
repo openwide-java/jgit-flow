@@ -42,7 +42,7 @@ public class ReleaseStartMojo extends AbstractJGitFlowMojo
      * Version number to increment - 0=Major, 1=Minor, 2=Minor/Patch (Depending on version pattern).
      */
     @Parameter(property = "versionNumberToIncrement", defaultValue = "2")
-    private String versionNumberToIncrement = "";
+    private String versionNumberToIncrement = "2";
 
      /**
       * Suffix to append to versions on the release branch.

@@ -107,6 +107,7 @@ public class ReleaseContext
         this.hotfixStartExtension = null;
         this.hotfixFinishExtension = null;
         this.eol = "";
+        this.versionNumberToIncrement = "2";
     }
 
     public boolean isAllowSnapshots()
@@ -144,6 +145,10 @@ public class ReleaseContext
 
     public String getVersionNumberToIncrement() {
 		return versionNumberToIncrement;
+	}
+
+    public int getVersionNumberToIncrementAsInt() {
+		return Integer.parseInt(versionNumberToIncrement);
 	}
 
 	public ReleaseContext setVersionNumberToIncrement(String versionNumberToIncrement) {
