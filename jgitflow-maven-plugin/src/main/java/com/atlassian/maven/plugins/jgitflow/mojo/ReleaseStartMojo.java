@@ -39,8 +39,14 @@ public class ReleaseStartMojo extends AbstractJGitFlowMojo
     private String developmentVersion = "";
 
     /**
-     * Suffix to append to versions on the release branch.
+     * Version number to increment - 0=Major, 1=Minor, 2=Minor/Patch (Depending on version pattern).
      */
+    @Parameter(property = "versionNumberToIncrement", defaultValue = "2")
+    private String versionNumberToIncrement = "2";
+
+     /**
+      * Suffix to append to versions on the release branch.
+      */
     @Parameter(property = "releaseBranchVersionSuffix", defaultValue = "")
     private String releaseBranchVersionSuffix = "";
 
@@ -88,6 +94,7 @@ public class ReleaseStartMojo extends AbstractJGitFlowMojo
            .setInteractive(getSettings().isInteractiveMode())
            .setDefaultReleaseVersion(releaseVersion)
            .setDefaultDevelopmentVersion(developmentVersion)
+           .setVersionNumberToIncrement(versionNumberToIncrement)
            .setReleaseBranchVersionSuffix(releaseBranchVersionSuffix)
            .setAllowSnapshots(allowSnapshots)
            .setUpdateDependencies(updateDependencies)

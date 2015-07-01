@@ -20,9 +20,6 @@ dependency-reduced-pom.xml
 data
 apps
 build-number.txt
-
-# eclipse spewage
-.project
 .classpath
-.settings/
-
+*.project
+.settings
