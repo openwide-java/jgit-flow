@@ -4,7 +4,7 @@
     <parent>
         <groupId>external.atlassian.jgitflow</groupId>
         <artifactId>jgitflow-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0-mjf_241_lburton_configurable_bump_from_release_start_version-SNAPSHOT</version>
     </parent>
 
     <artifactId>jgitflow-maven-plugin</artifactId>
