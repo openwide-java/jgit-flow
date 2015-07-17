@@ -77,7 +77,7 @@ public class GitHelper
         {
             if (null != walk)
             {
-                walk.release();
+                walk.close();
             }
         }
     }
@@ -162,7 +162,7 @@ public class GitHelper
         {
             if (null != walk)
             {
-                walk.release();
+                walk.close();
             }
         }
     }
@@ -318,7 +318,7 @@ public class GitHelper
         }
         finally
         {
-            walk.release();
+            walk.close();
         }
 
         return behind;

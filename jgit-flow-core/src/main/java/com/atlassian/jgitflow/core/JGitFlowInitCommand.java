@@ -298,7 +298,7 @@ public class JGitFlowInitCommand implements Callable<JGitFlow>
         {
             if (null != walk)
             {
-                walk.release();
+                walk.close();
             }
 
             reporter.endCommand();
