@@ -62,7 +62,7 @@
             <dependency>
                 <groupId>org.eclipse.jgit</groupId>
                 <artifactId>org.eclipse.jgit.console</artifactId>
-                <version>${jgit.version}</version>
+                <version>${jgitconsole.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.jcraft</groupId>
@@ -380,7 +380,8 @@
         <maven.plugin.plugin.version>3.3</maven.plugin.plugin.version>
         <maven.release.version>2.4</maven.release.version>
         <jsch.agent.version>0.0.7</jsch.agent.version>
-        <jgit.version>3.7.1.201504261725-r</jgit.version>
+        <jgit.version>4.0.1.201506240215-r</jgit.version>
+        <jgitconsole.version>3.7.1.201504261725-r</jgitconsole.version>
         <jline.version>1.0</jline.version>
         <gson.version>2.2.2</gson.version>
         <jdom2.version>2.0.4</jdom2.version>
