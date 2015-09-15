@@ -215,7 +215,7 @@ public class DefaultVersionProvider extends AbstractLogEnabled implements Versio
             {
                 String rootProjectId = ArtifactUtils.versionlessKey(rootProject.getGroupId(), rootProject.getArtifactId());
 
-                String rootVersion = getNextVersion(versionState, versionType, rootProject, rootProject, contextVersion, promptLabel);
+                String rootVersion = getNextVersion(versionState, versionType, rootProject, rootProject, contextVersion, promptLabel, ctx.isIncrementDevelopFromReleaseVersion());
 
                 versions.put(rootProjectId, rootVersion);
 
@@ -230,7 +230,7 @@ public class DefaultVersionProvider extends AbstractLogEnabled implements Versio
                 for (MavenProject project : reactorProjects)
                 {
                     String projectId = ArtifactUtils.versionlessKey(project.getGroupId(), project.getArtifactId());
-                    String moduleVersion = getNextVersion(versionState, versionType, rootProject, project, contextVersion, promptLabel);
+                    String moduleVersion = getNextVersion(versionState, versionType, rootProject, project, contextVersion, promptLabel, ctx.isIncrementDevelopFromReleaseVersion());
                     versions.put(projectId, moduleVersion);
                 }
             }
@@ -272,7 +272,7 @@ public class DefaultVersionProvider extends AbstractLogEnabled implements Versio
         return lastReleaseVersions.get(ProjectCacheKey.MASTER_BRANCH);
     }
 
-    protected String getNextVersion(VersionState state, VersionType versionType, MavenProject rootProject, MavenProject project, String contextVersion, String promptLabel) throws MavenJGitFlowException
+    protected String getNextVersion(VersionState state, VersionType versionType, MavenProject rootProject, MavenProject project, String contextVersion, String promptLabel, boolean isIncrementDevelopFromReleaseVersion) throws MavenJGitFlowException
     {
         ReleaseContext ctx = contextProvider.getContext();
         String defaultVersion = null;
@@ -296,7 +296,8 @@ public class DefaultVersionProvider extends AbstractLogEnabled implements Versio
             else
             {
                 String baseVersion = null;
-                if (VersionType.DEVELOPMENT.equals(versionType) && nextReleaseVersions.containsKey(ProjectCacheKey.RELEASE_START_LABEL))
+                // MJF-241: Get next version from the release only if configured
+                if (isIncrementDevelopFromReleaseVersion && VersionType.DEVELOPMENT.equals(versionType) && nextReleaseVersions.containsKey(ProjectCacheKey.RELEASE_START_LABEL))
                 {
                     // MJF-176: Get next version from the release version
                     Map<String, String> versionCache = nextReleaseVersions.get(ProjectCacheKey.RELEASE_START_LABEL);
