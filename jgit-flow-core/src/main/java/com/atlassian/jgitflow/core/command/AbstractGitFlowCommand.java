@@ -97,17 +97,23 @@ public abstract class AbstractGitFlowCommand<C, T> implements Callable<T>, JGitF
                     for (PushResult pr : i)
                     {
                         reporter.infoText(getCommandName(), "messages: '" + pr.getMessages() + "'");
+                        
+                        if(null != pr && null != pr.getRemoteUpdates() && !pr.getRemoteUpdates().isEmpty()) {
+                            for (RemoteRefUpdate update : pr.getRemoteUpdates()) {
 
-                        for(RemoteRefUpdate update : pr.getRemoteUpdates()) {
-
-                            RemoteRefUpdate.Status trackingStatus = update.getStatus();
-                            if (failedResult(trackingStatus)) {
-                                if (pr.getMessages() != null && pr.getMessages().length() > 0) {
-                                    throw new JGitFlowGitAPIException("error pushing to " + branchToPush + " - status: " + trackingStatus.name() + " - " + pr.getMessages());
-                                } else {
-                                    throw new JGitFlowGitAPIException("error pushing to " + branchToPush + " - " + trackingStatus.name());
+                                RemoteRefUpdate.Status trackingStatus = update.getStatus();
+                                if (failedResult(trackingStatus)) {
+                                    if (pr.getMessages() != null && pr.getMessages().length() > 0) {
+                                        throw new JGitFlowGitAPIException("error pushing to " + branchToPush + " - status: " + trackingStatus.name() + " - " + pr.getMessages());
+                                    } else {
+                                        throw new JGitFlowGitAPIException("error pushing to " + branchToPush + " - " + trackingStatus.name());
+                                    }
                                 }
                             }
+                        }
+                        else
+                        {
+                            throw new JGitFlowGitAPIException("error pushing to " + branchToPush + " - " + pr.getMessages());
                         }
                     }
                 }
