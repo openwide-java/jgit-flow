@@ -44,6 +44,12 @@ public class ReleaseStartMojo extends AbstractJGitFlowMojo
     @Parameter(property = "versionNumberToIncrement", defaultValue = "2")
     private String versionNumberToIncrement = "2";
 
+    /**
+     * Increment the new develop branch version number based off of the release version.
+     */
+    @Parameter(defaultValue = "false", property = "incrementDevelopFromReleaseVersion")
+    private boolean incrementDevelopFromReleaseVersion = false;
+
      /**
       * Suffix to append to versions on the release branch.
       */
@@ -95,6 +101,7 @@ public class ReleaseStartMojo extends AbstractJGitFlowMojo
            .setDefaultReleaseVersion(releaseVersion)
            .setDefaultDevelopmentVersion(developmentVersion)
            .setVersionNumberToIncrement(versionNumberToIncrement)
+           .setIncrementDevelopFromReleaseVersion(incrementDevelopFromReleaseVersion)
            .setReleaseBranchVersionSuffix(releaseBranchVersionSuffix)
            .setAllowSnapshots(allowSnapshots)
            .setUpdateDependencies(updateDependencies)
@@ -112,7 +119,7 @@ public class ReleaseStartMojo extends AbstractJGitFlowMojo
            .setUsername(username)
            .setPassword(password)
            .setReleaseStartExtension(extensionObject)
-                .setEol(eol)
+           .setEol(eol)
            .setFlowInitContext(getFlowInitContext().getJGitFlowContext());
 
         try

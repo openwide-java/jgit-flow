@@ -35,6 +35,7 @@ public class ReleaseContext
     private String defaultReleaseVersion;
     private String defaultDevelopmentVersion;
     private String versionNumberToIncrement;
+    private boolean incrementDevelopFromReleaseVersion;
     private String defaultFeatureName;
     private String releaseBranchVersionSuffix;
     private InitContext flowInitContext;
@@ -156,7 +157,16 @@ public class ReleaseContext
 		return this;
 	}
 
-	public boolean isInteractive()
+    public boolean isIncrementDevelopFromReleaseVersion() {
+        return incrementDevelopFromReleaseVersion;
+    }
+
+    public ReleaseContext setIncrementDevelopFromReleaseVersion(boolean incrementDevelopFromReleaseVersion) {
+        this.incrementDevelopFromReleaseVersion = incrementDevelopFromReleaseVersion;
+        return this;
+    }
+
+    public boolean isInteractive()
     {
         return interactive;
     }
