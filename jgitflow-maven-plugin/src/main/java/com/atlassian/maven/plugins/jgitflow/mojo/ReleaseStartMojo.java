@@ -86,6 +86,12 @@ public class ReleaseStartMojo extends AbstractJGitFlowMojo
     @Parameter(defaultValue = "")
     private String releaseStartExtension = "";
 
+    /**
+     * Whether to add -SNAPSHOT to the new version in the release branch
+     */
+    @Parameter(defaultValue = "true", property = "releaseSnapshots")
+    private boolean releaseSnapshots = true;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -120,6 +126,7 @@ public class ReleaseStartMojo extends AbstractJGitFlowMojo
            .setPassword(password)
            .setReleaseStartExtension(extensionObject)
            .setEol(eol)
+           .setReleaseSnapshots(releaseSnapshots) 
            .setFlowInitContext(getFlowInitContext().getJGitFlowContext());
 
         try
