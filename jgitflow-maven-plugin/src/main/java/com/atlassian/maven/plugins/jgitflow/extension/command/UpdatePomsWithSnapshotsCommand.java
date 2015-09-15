@@ -57,13 +57,15 @@ public class UpdatePomsWithSnapshotsCommand implements ExtensionCommand
 
             ReleaseContext ctx = contextProvider.getContext();
             JGitFlow flow = jGitFlowProvider.gitFlow();
-
+            boolean doSnapshots = true;
+            
             switch (branchType)
             {
                 case RELEASE:
                     cacheKey = ProjectCacheKey.RELEASE_START_LABEL;
                     versionType = VersionType.RELEASE;
                     versionSuffix = ctx.getReleaseBranchVersionSuffix();
+                    doSnapshots = ctx.isReleaseSnapshots();
                     break;
 
                 case HOTFIX:
@@ -83,9 +85,15 @@ public class UpdatePomsWithSnapshotsCommand implements ExtensionCommand
 
             //reload the reactor projects for release
             List<MavenProject> branchProjects = branchHelper.getProjectsForCurrentBranch();
-
-            pomUpdater.addSnapshotToPomVersions(cacheKey, versionType, versionSuffix, branchProjects);
-
+            
+            if(doSnapshots) {
+                pomUpdater.addSnapshotToPomVersions(cacheKey, versionType, versionSuffix, branchProjects);
+            }
+            else
+            {
+                pomUpdater.removeSnapshotFromPomVersionsKeepSuffix(cacheKey, versionSuffix, branchProjects);
+            }
+            
             projectHelper.commitAllPoms(flow.git(), branchProjects, ctx.getScmCommentPrefix() + "updating poms for " + unprefixedBranchName + " branch with snapshot versions" + ctx.getScmCommentSuffix());
         }
         catch (Exception e)

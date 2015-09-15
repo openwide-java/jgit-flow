@@ -74,6 +74,45 @@ public class DefaultPomUpdater extends AbstractLogEnabled implements PomUpdater
     }
 
     @Override
+    public void removeSnapshotFromPomVersionsKeepSuffix(ProjectCacheKey cacheKey, String versionSuffix, List<MavenProject> reactorProjects) throws MavenJGitFlowException 
+    {
+        String fullBranchName = branchHelper.getCurrentBranchName();
+
+        getLogger().info("(" + fullBranchName + ") removing snapshot from pom versions...");
+        ReleaseContext ctx = contextProvider.getContext();
+
+        Map<String, String> originalVersions = versionProvider.getOriginalVersions(cacheKey, reactorProjects);
+
+        final String delimitedVersionSuffix = getDelimitedVersionSuffix(versionSuffix);
+
+        Map<String, String> finalVersions = Maps.transformValues(originalVersions, new Function<String, String>()
+        {
+            @Override
+            public String apply(String input)
+            {
+                if (input.endsWith(delimitedVersionSuffix + "-SNAPSHOT"))
+                {
+                    return StringUtils.substringBeforeLast(input, "-SNAPSHOT");
+                }
+                else if(input.endsWith("-SNAPSHOT"))
+                {
+                    return StringUtils.substringBeforeLast(input, "-SNAPSHOT") + delimitedVersionSuffix;
+                }
+                else if(!input.endsWith(delimitedVersionSuffix))
+                {
+                    return input + delimitedVersionSuffix;
+                }
+                else
+                {
+                    return input;
+                }
+            }
+        });
+
+        doUpdate(reactorProjects, originalVersions, finalVersions, ctx.isUpdateDependencies(), ctx.isConsistentProjectVersions());
+    }
+
+    @Override
     public void addSnapshotToPomVersions(ProjectCacheKey cacheKey, final VersionType versionType, final String versionSuffix, List<MavenProject> reactorProjects) throws MavenJGitFlowException
     {
         String fullBranchName = branchHelper.getCurrentBranchName();

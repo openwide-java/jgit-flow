@@ -496,6 +496,24 @@ public class ReleaseManagerStartReleaseTest extends AbstractFlowManagerTest
     }
 
     @Test
+    public void releaseWithComplexVersionSuffixNoSnap() throws Exception
+    {
+        String projectName = "complex-version-and-suffix-nosnap";
+        List<MavenProject> projects = createReactorProjects("rewrite-for-release", projectName);
+        File projectRoot = projects.get(0).getBasedir();
+
+        ReleaseContext ctx = new ReleaseContext(projectRoot);
+
+        ctx.setInteractive(false)
+                .setNoTag(true)
+                .setAllowSnapshots(true)
+                .setReleaseBranchVersionSuffix("RC")
+                .setReleaseSnapshots(false);
+
+        basicReleaseRewriteTest(projectName, ctx);
+    }
+
+    @Test
     public void releaseWithReleasedParent() throws Exception
     {
         basicReleaseRewriteTest("pom-with-released-parent");

@@ -147,6 +147,22 @@ public class ReleaseManagerFinishReleaseTest extends AbstractFlowManagerTest
         basicReleaseRewriteTest(projectName, ctx);
     }
 
+    @Test
+    public void releaseFinishWithComplexVersionAndSuffixNoSnap() throws Exception
+    {
+        String commentPrefix = "woot!";
+
+        String projectName = "complex-version-and-suffix-nosnap";
+
+        List<MavenProject> projects = createReactorProjects("rewrite-for-release", projectName);
+        File projectRoot = projects.get(0).getBasedir();
+
+        ReleaseContext ctx = new ReleaseContext(projectRoot);
+        ctx.setInteractive(false).setNoTag(true).setAllowSnapshots(true).setReleaseBranchVersionSuffix("RC").setReleaseSnapshots(false);
+
+        basicReleaseRewriteTest(projectName, ctx);
+    }
+
     @Test(expected = MavenJGitFlowException.class)
     public void releaseFinishWithoutReleaseStart() throws Exception
     {

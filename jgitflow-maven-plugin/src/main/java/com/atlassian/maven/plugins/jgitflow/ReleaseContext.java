@@ -61,6 +61,7 @@ public class ReleaseContext
     private MavenHotfixStartExtension hotfixStartExtension;
     private MavenHotfixFinishExtension hotfixFinishExtension;
     private String eol;
+    private boolean releaseSnapshots;
 
     public ReleaseContext(File baseDir)
     {
@@ -109,6 +110,7 @@ public class ReleaseContext
         this.hotfixFinishExtension = null;
         this.eol = "";
         this.versionNumberToIncrement = "2";
+        this.releaseSnapshots = true;
     }
 
     public boolean isAllowSnapshots()
@@ -618,6 +620,17 @@ public class ReleaseContext
     public ReleaseContext setEol(String eol)
     {
         this.eol = eol;
+        return this;
+    }
+
+    public boolean isReleaseSnapshots()
+    {
+        return releaseSnapshots;
+    }
+
+    public ReleaseContext setReleaseSnapshots(boolean releaseSnapshots)
+    {
+        this.releaseSnapshots = releaseSnapshots;
         return this;
     }
     
