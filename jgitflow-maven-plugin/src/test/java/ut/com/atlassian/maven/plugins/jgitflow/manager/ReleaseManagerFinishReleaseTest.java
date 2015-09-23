@@ -21,7 +21,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Ref;
 import org.junit.Test;
 
-import ut.com.atlassian.maven.plugins.jgitflow.TestFinishExtension;
+import ut.com.atlassian.maven.plugins.jgitflow.TestReleaseFinishExtension;
 import ut.com.atlassian.maven.plugins.jgitflow.testutils.RepoUtil;
 
 import static org.junit.Assert.*;
@@ -175,7 +175,7 @@ public class ReleaseManagerFinishReleaseTest extends AbstractFlowManagerTest
 
         MavenSession session = new MavenSession(getContainer(), new Settings(), localRepository, null, null, null, projectRoot.getAbsolutePath(), new Properties(), new Properties(), null);
 
-        TestFinishExtension extension = new TestFinishExtension();
+        TestReleaseFinishExtension extension = new TestReleaseFinishExtension();
 
         ReleaseContext ctx = new ReleaseContext(projectRoot);
         ctx.setInteractive(false)
@@ -203,7 +203,7 @@ public class ReleaseManagerFinishReleaseTest extends AbstractFlowManagerTest
 
         MavenSession session = new MavenSession(getContainer(), new Settings(), localRepository, null, null, null, projectRoot.getAbsolutePath(), new Properties(), new Properties(), null);
 
-        TestFinishExtension extension = new TestFinishExtension();
+        TestReleaseFinishExtension extension = new TestReleaseFinishExtension();
 
         ReleaseContext ctx = new ReleaseContext(projectRoot);
         ctx.setInteractive(false)

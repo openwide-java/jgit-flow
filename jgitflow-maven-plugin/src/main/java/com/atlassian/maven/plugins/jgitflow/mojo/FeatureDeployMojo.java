@@ -1,5 +1,7 @@
 package com.atlassian.maven.plugins.jgitflow.mojo;
 
+import com.atlassian.maven.jgitflow.api.MavenFeatureDeployExtension;
+import com.atlassian.maven.jgitflow.api.MavenReleaseStartExtension;
 import com.atlassian.maven.plugins.jgitflow.ReleaseContext;
 import com.atlassian.maven.plugins.jgitflow.exception.MavenJGitFlowException;
 import com.atlassian.maven.plugins.jgitflow.manager.FlowReleaseManager;
@@ -38,9 +40,24 @@ public class FeatureDeployMojo extends AbstractJGitFlowMojo
     @Component(hint = "feature")
     FlowReleaseManager releaseManager;
 
+    /**
+     * A FQCN of a compatible feature deploy extension.
+     * Extensions are used to run custom code at various points in the jgitflow lifecycle.
+     *
+     * More documentation on using extensions will be available in the future
+     */
+    @Parameter(defaultValue = "")
+    private String featureDeployExtension = "";
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
+        ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader();
+
+        Thread.currentThread().setContextClassLoader(getClassloader(getClasspath()));
+
+        MavenFeatureDeployExtension extensionObject = (MavenFeatureDeployExtension) getExtensionInstance(featureDeployExtension);
+        
         ReleaseContext ctx = new ReleaseContext(getBasedir());
         ctx.setInteractive(getSettings().isInteractiveMode())
            .setNoDeploy(false)
@@ -64,6 +81,10 @@ public class FeatureDeployMojo extends AbstractJGitFlowMojo
         catch (MavenJGitFlowException e)
         {
             throw new MojoExecutionException("Error finishing feature: " + e.getMessage(), e);
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader(oldClassloader);
         }
     }
 }

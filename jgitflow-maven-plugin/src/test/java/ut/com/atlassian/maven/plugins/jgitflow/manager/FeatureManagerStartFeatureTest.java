@@ -15,7 +15,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+import org.eclipse.jgit.api.Git;
 import org.junit.Test;
+import ut.com.atlassian.maven.plugins.jgitflow.TestFeatureStartExtension;
+import ut.com.atlassian.maven.plugins.jgitflow.TestReleaseFinishExtension;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -100,6 +103,36 @@ public class FeatureManagerStartFeatureTest extends AbstractFlowManagerTest
 
         String pom = FileUtils.readFileToString(projects.get(0).getFile());
         assertTrue(pom.contains("1.0-" + UNDERSCORED_FEATURE_NAME + "-SNAPSHOT"));
+    }
+
+    @Test
+    public void startFeatureWithExternalExtension() throws Exception
+    {
+        String projectSubdir = "basic-pom";
+        List<MavenProject> projects = createReactorProjects("rewrite-for-release", projectSubdir);
+        File projectRoot = projects.get(0).getBasedir();
+
+        JGitFlow flow = JGitFlow.getOrInit(projectRoot);
+
+        flow.git().checkout().setName(flow.getDevelopBranchName()).call();
+
+        assertOnDevelop(flow);
+
+        initialCommitAll(flow);
+
+        FlowReleaseManager relman = getFeatureManager();
+
+        TestFeatureStartExtension extension = new TestFeatureStartExtension();
+        
+        ReleaseContext ctx = new ReleaseContext(projectRoot);
+        ctx.setInteractive(false).setDefaultFeatureName(FEATURE_NAME).setFeatureStartExtension(extension).setEnableFeatureVersions(true);
+
+        MavenSession session = new MavenSession(getContainer(), new Settings(), localRepository, null, null, null, projectRoot.getAbsolutePath(), new Properties(), new Properties(), null);
+
+        relman.start(ctx, projects, session);
+
+        assertEquals("old version incorrect", "1.0-SNAPSHOT", extension.getOldVersion());
+        assertEquals("new version incorrect", "1.0-" + UNDERSCORED_FEATURE_NAME + "-SNAPSHOT", extension.getNewVersion());
     }
 }
 

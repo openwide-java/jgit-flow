@@ -4,7 +4,7 @@ import com.atlassian.jgitflow.core.JGitFlowInfo;
 import com.atlassian.maven.jgitflow.api.exception.MavenJGitFlowExtensionException;
 import com.atlassian.maven.jgitflow.api.impl.NoopMavenReleaseFinishExtension;
 
-public class TestFinishExtension extends NoopMavenReleaseFinishExtension
+public class TestReleaseFinishExtension extends NoopMavenReleaseFinishExtension
 {
     private String oldVersion;
     private String newVersion;

@@ -3,7 +3,7 @@ package com.atlassian.maven.jgitflow.api;
 import com.atlassian.jgitflow.core.JGitFlowInfo;
 import com.atlassian.maven.jgitflow.api.exception.MavenJGitFlowExtensionException;
 
-public interface StartProductionBranchExtension extends MavenJGitFlowExtension
+public interface StartBranchExtension extends MavenJGitFlowExtension
 {
     /**
      * Called when the version changes on "topic" branches.

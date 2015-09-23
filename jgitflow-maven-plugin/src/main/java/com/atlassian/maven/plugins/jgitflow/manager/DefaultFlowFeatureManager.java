@@ -63,7 +63,7 @@ public class DefaultFlowFeatureManager extends AbstractFlowReleaseManager
 
             flow = jGitFlowProvider.gitFlow();
 
-            startExtension.init();
+            startExtension.init(ctx.getFeatureStartExtension());
 
             flow.featureStart(featureName)
                 .setAllowUntracked(ctx.isAllowUntracked())

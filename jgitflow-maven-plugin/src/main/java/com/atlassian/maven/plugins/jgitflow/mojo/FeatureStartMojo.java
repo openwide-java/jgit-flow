@@ -1,5 +1,7 @@
 package com.atlassian.maven.plugins.jgitflow.mojo;
 
+import com.atlassian.maven.jgitflow.api.MavenFeatureStartExtension;
+import com.atlassian.maven.jgitflow.api.MavenReleaseStartExtension;
 import com.atlassian.maven.plugins.jgitflow.ReleaseContext;
 import com.atlassian.maven.plugins.jgitflow.exception.MavenJGitFlowException;
 import com.atlassian.maven.plugins.jgitflow.manager.FlowReleaseManager;
@@ -44,9 +46,24 @@ public class FeatureStartMojo extends AbstractJGitFlowMojo
     @Component(hint = "feature")
     FlowReleaseManager releaseManager;
 
+    /**
+     * A FQCN of a compatible feature start extension.
+     * Extensions are used to run custom code at various points in the jgitflow lifecycle.
+     *
+     * More documentation on using extensions will be available in the future
+     */
+    @Parameter(defaultValue = "")
+    private String featureStartExtension = "";
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
+        ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader();
+
+        Thread.currentThread().setContextClassLoader(getClassloader(getClasspath()));
+
+        MavenFeatureStartExtension extensionObject = (MavenFeatureStartExtension) getExtensionInstance(featureStartExtension);
+        
         ReleaseContext ctx = new ReleaseContext(getBasedir());
         ctx.setInteractive(getSettings().isInteractiveMode())
            .setDefaultFeatureName(featureName)
@@ -66,7 +83,8 @@ public class FeatureStartMojo extends AbstractJGitFlowMojo
            .setUseReleaseProfile(false)
            .setUsername(username)
            .setPassword(password)
-                .setEol(eol)
+           .setFeatureStartExtension(extensionObject)
+           .setEol(eol)
            .setFlowInitContext(getFlowInitContext().getJGitFlowContext());
 
         try
@@ -76,6 +94,10 @@ public class FeatureStartMojo extends AbstractJGitFlowMojo
         catch (MavenJGitFlowException e)
         {
             throw new MojoExecutionException("Error starting feature: " + e.getMessage(), e);
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader(oldClassloader);
         }
     }
 }

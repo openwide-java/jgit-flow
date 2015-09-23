@@ -1,10 +1,7 @@
 package com.atlassian.maven.plugins.jgitflow;
 
 import com.atlassian.jgitflow.core.InitContext;
-import com.atlassian.maven.jgitflow.api.MavenHotfixFinishExtension;
-import com.atlassian.maven.jgitflow.api.MavenHotfixStartExtension;
-import com.atlassian.maven.jgitflow.api.MavenReleaseFinishExtension;
-import com.atlassian.maven.jgitflow.api.MavenReleaseStartExtension;
+import com.atlassian.maven.jgitflow.api.*;
 import com.google.common.base.Strings;
 
 import java.io.File;
@@ -60,6 +57,9 @@ public class ReleaseContext
     private MavenReleaseFinishExtension releaseFinishExtension;
     private MavenHotfixStartExtension hotfixStartExtension;
     private MavenHotfixFinishExtension hotfixFinishExtension;
+    private MavenFeatureStartExtension featureStartExtension;
+    private MavenFeatureFinishExtension featureFinishExtension;
+    private MavenFeatureDeployExtension featureDeployExtension;
     private String eol;
     private boolean releaseSnapshots;
 
@@ -653,6 +653,39 @@ public class ReleaseContext
     public ReleaseContext setHotfixFinishExtension(MavenHotfixFinishExtension hotfixFinishExtension)
     {
         this.hotfixFinishExtension = hotfixFinishExtension;
+        return this;
+    }
+
+    public MavenFeatureStartExtension getFeatureStartExtension()
+    {
+        return featureStartExtension;
+    }
+
+    public ReleaseContext setFeatureStartExtension(MavenFeatureStartExtension featureStartExtension)
+    {
+        this.featureStartExtension = featureStartExtension;
+        return this;
+    }
+
+    public MavenFeatureFinishExtension getFeatureFinishExtension()
+    {
+        return featureFinishExtension;
+    }
+
+    public ReleaseContext setFeatureFinishExtension(MavenFeatureFinishExtension featureFinishExtension)
+    {
+        this.featureFinishExtension = featureFinishExtension;
+        return this;
+    }
+
+    public MavenFeatureDeployExtension getFeatureDeployExtension()
+    {
+        return featureDeployExtension;
+    }
+
+    public ReleaseContext setFeatureDeployExtension(MavenFeatureDeployExtension featureDeployExtension)
+    {
+        this.featureDeployExtension = featureDeployExtension;
         return this;
     }
 }
