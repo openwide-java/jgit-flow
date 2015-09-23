@@ -11,6 +11,7 @@ import com.atlassian.jgitflow.core.extension.impl.EmptyHotfixFinishExtension;
 import com.atlassian.jgitflow.core.extension.impl.MergeProcessExtensionWrapper;
 import com.atlassian.jgitflow.core.util.GitHelper;
 
+import com.atlassian.jgitflow.core.util.RequirementHelper;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -138,6 +139,8 @@ public class HotfixFinishCommand extends AbstractBranchMergingCommand<HotfixFini
             if (releaseBranchExists())
             {
                 String releaseBranchName = getReleaseBranchName();
+                requirementHelper.requireLocalBranchExists(releaseBranchName);
+                
                 MergeProcessExtensionWrapper releaseExtension = new MergeProcessExtensionWrapper(extension.beforeReleaseCheckout(), extension.afterReleaseCheckout(), extension.beforeReleaseMerge(), extension.afterReleaseMerge());
 
                 releaseResult = doMerge(gfConfig.getMaster(), releaseBranchName, releaseExtension);
@@ -198,7 +201,7 @@ public class HotfixFinishCommand extends AbstractBranchMergingCommand<HotfixFini
             branchName = branches.get(0).getName();
         }
 
-        return branchName;
+        return branchName.substring(branchName.indexOf(gfConfig.getPrefixValue(JGitFlowConstants.PREFIXES.RELEASE.configKey())));
     }
 
     /**

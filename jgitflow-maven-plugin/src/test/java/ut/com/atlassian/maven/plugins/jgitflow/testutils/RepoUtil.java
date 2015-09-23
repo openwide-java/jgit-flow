@@ -37,6 +37,19 @@ public class RepoUtil
         return git;
     }
 
+    public static Git createRepositoryWithMasterAndDevelopAndRelease(File dir,String release) throws GitAPIException
+    {
+        Git git = Git.init().setDirectory(dir).call();
+        git.add().addFilepattern(".").call();
+        git.commit().setMessage("initial commit").call();
+        git.branchCreate().setName("release/" + release).call();
+        git.commit().setMessage("added release branch").call();
+        git.branchCreate().setName("develop").call();
+        git.commit().setMessage("added develop branch").call();
+
+        return git;
+    }
+
     public static Git createRepositoryWithBranches(File dir, String... branches) throws GitAPIException
     {
         Git git = Git.init().setDirectory(dir).call();

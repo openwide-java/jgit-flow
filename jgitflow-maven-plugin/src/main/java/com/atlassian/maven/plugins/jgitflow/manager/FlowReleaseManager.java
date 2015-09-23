@@ -2,6 +2,8 @@ package com.atlassian.maven.plugins.jgitflow.manager;
 
 import java.util.List;
 
+import com.atlassian.jgitflow.core.JGitFlow;
+import com.atlassian.jgitflow.core.exception.JGitFlowException;
 import com.atlassian.maven.plugins.jgitflow.ReleaseContext;
 import com.atlassian.maven.plugins.jgitflow.exception.MavenJGitFlowException;
 
@@ -18,4 +20,6 @@ public interface FlowReleaseManager
     void finish(ReleaseContext ctx, List<MavenProject> reactorProjects, MavenSession session) throws MavenJGitFlowException;
 
     void deploy(ReleaseContext ctx, List<MavenProject> reactorProjects, MavenSession session, String buildNumber, String goals) throws MavenJGitFlowException;
+    
+    JGitFlow flow() throws JGitFlowException;
 }

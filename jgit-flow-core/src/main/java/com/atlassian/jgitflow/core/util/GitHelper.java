@@ -462,6 +462,7 @@ public class GitHelper
         reporter.debugMethod(getName(), "workingTreeIsClean");
         try
         {
+            git.getRepository().getRefDatabase().refresh();
             IndexDiff diffIndex = new IndexDiff(git.getRepository(), Constants.HEAD, new FileTreeIterator(git.getRepository()));
 
             if (diffIndex.diff())

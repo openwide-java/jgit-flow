@@ -69,4 +69,9 @@ public abstract class AbstractFlowReleaseManager extends AbstractLogEnabled impl
         setupHelper.runCommonSetup();
 
     }
+
+    @Override
+    public JGitFlow flow() throws JGitFlowException {
+        return jGitFlowProvider.gitFlow();
+    }
 }

@@ -11,6 +11,7 @@ import com.atlassian.maven.plugins.jgitflow.ReleaseContext;
 import com.atlassian.maven.plugins.jgitflow.helper.SessionAndProjects;
 import com.atlassian.maven.plugins.jgitflow.manager.FlowReleaseManager;
 
+import com.atlassian.maven.plugins.jgitflow.provider.JGitFlowProvider;
 import com.google.common.base.Strings;
 
 import org.apache.maven.artifact.Artifact;
@@ -262,6 +263,11 @@ public abstract class AbstractFlowManagerTest extends PlexusJUnit4TestCase
         assertTrue(flow.git().getRepository().getBranch().contains(flow.getHotfixBranchPrefix()));
     }
 
+    protected JGitFlow getFlow() throws Exception
+    {
+        return (JGitFlow) ((JGitFlowProvider)lookup(JGitFlowProvider.class.getName())).gitFlow();
+    }
+    
     protected FlowReleaseManager getReleaseManager() throws Exception
     {
         return (FlowReleaseManager) lookup(FlowReleaseManager.class.getName(), "release");
