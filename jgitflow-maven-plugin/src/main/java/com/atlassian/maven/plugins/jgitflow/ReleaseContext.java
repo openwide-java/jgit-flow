@@ -62,6 +62,7 @@ public class ReleaseContext
     private MavenHotfixFinishExtension hotfixFinishExtension;
     private String eol;
     private boolean releaseSnapshots;
+    private String[] protectedArtifactsPatterns;
 
     public ReleaseContext(File baseDir)
     {
@@ -111,6 +112,7 @@ public class ReleaseContext
         this.eol = "";
         this.versionNumberToIncrement = "2";
         this.releaseSnapshots = true;
+        this.protectedArtifactsPatterns = new String[]{};
     }
 
     public boolean isAllowSnapshots()
@@ -632,6 +634,21 @@ public class ReleaseContext
     {
         this.releaseSnapshots = releaseSnapshots;
         return this;
+    }
+
+    public String[] getProtectedArtifactsPatterns() {
+        return protectedArtifactsPatterns;
+    }
+
+    public void setProtectedArtifactsPatterns(String[] protectedArtifactsPatterns) {
+        if (protectedArtifactsPatterns == null)
+        {
+            protectedArtifactsPatterns = new String[0];
+        }
+        else
+        {
+            this.protectedArtifactsPatterns = protectedArtifactsPatterns;
+        }
     }
     
     public MavenHotfixStartExtension getHotfixStartExtension()

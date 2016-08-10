@@ -8,8 +8,10 @@ import com.atlassian.maven.plugins.jgitflow.VersionType;
 import com.atlassian.maven.plugins.jgitflow.exception.MavenJGitFlowException;
 import com.atlassian.maven.plugins.jgitflow.helper.MavenExecutionHelper;
 import com.google.common.collect.ImmutableMap;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.release.util.ReleaseUtil;
 import org.apache.maven.shared.release.version.JGitFlowVersionInfo;
@@ -22,9 +24,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -62,34 +62,74 @@ public class DefaultVersionProvider extends AbstractLogEnabled implements Versio
     }
 
     @Override
-    public Map<String, String> getOriginalVersions(ProjectCacheKey cacheKey, List<MavenProject> reactorProjects)
+    public Map<String, String> getOriginalVersions(ProjectCacheKey cacheKey, List<MavenProject> reactorProjects, List<String> includePatterns)
     {
-        if (!originalVersions.containsKey(cacheKey))
+        if (cacheKey == null || !originalVersions.containsKey(cacheKey))
         {
             Map<String, String> versions = new HashMap<String, String>();
+            Set<String> reactorArtifacts = new HashSet<String>();
 
             for (MavenProject project : reactorProjects)
             {
-                versions.put(ArtifactUtils.versionlessKey(project.getGroupId(), project.getArtifactId()), project.getVersion());
+                String reactorArtifactKey = ArtifactUtils.versionlessKey(project.getGroupId(), project.getArtifactId());
+                versions.put(reactorArtifactKey, project.getVersion());
+                reactorArtifacts.add(reactorArtifactKey);
+
+                if (includePatterns != null && !includePatterns.isEmpty()) {
+                    Set<Artifact> artifacts = new HashSet<Artifact>();
+                    Set<Dependency> dependencies = new HashSet<Dependency>();
+
+                    if (project.getParentArtifact() != null) {
+                        artifacts.add(project.getParentArtifact());
+                    }
+                    if (project.getDependencyArtifacts() != null) {
+                        dependencies.addAll((List<Dependency>) project.getDependencies());
+                    }
+                    if (project.getDependencyManagement() != null && project.getDependencyManagement().getDependencies() != null) {
+                        dependencies.addAll((List<Dependency>) project.getDependencyManagement().getDependencies());
+                    }
+                    for (Artifact artifact : artifacts) {
+                        String key = ArtifactUtils.versionlessKey(artifact.getGroupId(), artifact.getArtifactId());
+                        if (!versions.containsKey(key) && matchIncludePatterns(artifact, includePatterns)) {
+                            getLogger().info(String.format("Added version %s -> %s", key, artifact.getBaseVersion()));
+                            versions.put(key, artifact.getBaseVersion());
+                        }
+                    }
+                    for (Dependency dependency : dependencies) {
+                        String key = ArtifactUtils.versionlessKey(dependency.getGroupId(), dependency.getArtifactId());
+                        if (!versions.containsKey(key) && matchIncludePatterns(dependency, includePatterns)) {
+                            getLogger().info(String.format("Added version %s -> %s", key, dependency.getVersion()));
+                            versions.put(key, dependency.getVersion());
+                        }
+                    }
+                }
             }
 
-            originalVersions.put(cacheKey, versions);
+            if (cacheKey != null) {
+                originalVersions.put(cacheKey, versions);
+            }
+            return ImmutableMap.copyOf(versions);
+        } else {
+            return ImmutableMap.copyOf(originalVersions.get(cacheKey));
         }
+    }
 
-        return ImmutableMap.copyOf(originalVersions.get(cacheKey));
+    @Override
+    public Map<String, String> getOriginalVersions(ProjectCacheKey cacheKey, List<MavenProject> reactorProjects)
+    {
+        return getOriginalVersions(cacheKey, reactorProjects, null);
+    }
+
+    @Override
+    public Map<String, String> getOriginalVersions(List<MavenProject> reactorProjects, List<String> includePatterns)
+    {
+        return getOriginalVersions(null, reactorProjects, includePatterns);
     }
 
     @Override
     public Map<String, String> getOriginalVersions(List<MavenProject> reactorProjects)
     {
-        Map<String, String> versions = new HashMap<String, String>();
-
-        for (MavenProject project : reactorProjects)
-        {
-            versions.put(ArtifactUtils.versionlessKey(project.getGroupId(), project.getArtifactId()), project.getVersion());
-        }
-
-        return ImmutableMap.copyOf(versions);
+        return getOriginalVersions(null, reactorProjects, null);
     }
 
     @Override
@@ -102,7 +142,7 @@ public class DefaultVersionProvider extends AbstractLogEnabled implements Versio
 
         MavenProject rootProject = ReleaseUtil.getRootProject(reactorProjects);
 
-        return getOriginalVersions(cacheKey, reactorProjects).get(ArtifactUtils.versionlessKey(rootProject.getGroupId(), rootProject.getArtifactId()));
+        return getOriginalVersions(cacheKey, reactorProjects, null).get(ArtifactUtils.versionlessKey(rootProject.getGroupId(), rootProject.getArtifactId()));
     }
 
     @Override
@@ -456,5 +496,125 @@ public class DefaultVersionProvider extends AbstractLogEnabled implements Versio
         }
 
         return suggestedVersion;
+    }
+
+    private boolean matchIncludePatterns(Artifact artifact, List<String> protectedArtifactsPatterns)
+    {
+        return include(artifact, protectedArtifactsPatterns);
+    }
+
+    private boolean matchIncludePatterns(Dependency dependency, List<String> protectedArtifactsPatterns)
+    {
+        return include(dependency, protectedArtifactsPatterns);
+    }
+
+    private boolean include(Artifact artifact, List<String> protectedArtifactsPatterns)
+    {
+        String[] tokens = new String[]{
+                artifact.getGroupId(),
+                artifact.getArtifactId(),
+                artifact.getType(),
+                artifact.getBaseVersion()
+        };
+        return include(tokens, protectedArtifactsPatterns);
+    }
+
+    private boolean include(Dependency artifact, List<String> protectedArtifactsPatterns)
+    {
+        String[] tokens = new String[]{
+                artifact.getGroupId(),
+                artifact.getArtifactId(),
+                artifact.getType(),
+                artifact.getVersion()
+        };
+        return include(tokens, protectedArtifactsPatterns);
+    }
+
+    private boolean include(String[] tokens, List<String> protectedArtifactsPatterns)
+    {
+        boolean matched = false;
+
+        for (String pattern : protectedArtifactsPatterns)
+        {
+            if (include(tokens, pattern))
+            {
+                matched = true;
+                break;
+            }
+        }
+
+        return matched;
+    }
+
+    /**
+     * Gets whether the specified artifact matches the specified pattern.
+     *
+     * @param tokens
+     *            the artifact translated as token to check
+     * @param pattern
+     *            the pattern to match, as defined above
+     * @return <code>true</code> if the specified artifact is matched by the specified pattern
+     */
+    private boolean include(String[] tokens, String pattern)
+    {
+        String[] patternTokens = pattern.split(":");
+
+        // fail immediately if pattern tokens outnumber tokens to match
+        boolean matched = patternTokens.length <= tokens.length;
+
+        for ( int i = 0; matched && i < patternTokens.length; i++ )
+        {
+            matched = matches( tokens[i], patternTokens[i] );
+        }
+
+        return matched;
+    }
+
+    /**
+     * Gets whether the specified token matches the specified pattern segment.
+     *
+     * @param token
+     *            the token to check
+     * @param pattern
+     *            the pattern segment to match, as defined above
+     * @return <code>true</code> if the specified token is matched by the specified pattern segment
+     */
+    private boolean matches( String token, String pattern )
+    {
+        boolean matches;
+
+        // support full wildcard and implied wildcard
+        if ( "*".equals( pattern ) || pattern.length() == 0 )
+        {
+            matches = true;
+        }
+        // support contains wildcard
+        else if ( pattern.startsWith( "*" ) && pattern.endsWith( "*" ) )
+        {
+            String contains = pattern.substring( 1, pattern.length() - 1 );
+
+            matches = token.contains( contains );
+        }
+        // support leading wildcard
+        else if ( pattern.startsWith( "*" ) )
+        {
+            String suffix = pattern.substring( 1, pattern.length() );
+
+            matches = token.endsWith( suffix );
+        }
+        // support trailing wildcard
+        else if ( pattern.endsWith( "*" ) )
+        {
+            String prefix = pattern.substring( 0, pattern.length() - 1 );
+
+            matches = token.startsWith( prefix );
+        }
+        // support exact match
+        else
+        {
+            matches = token.equals( pattern );
+        }
+
+        return matches;
     }
 }

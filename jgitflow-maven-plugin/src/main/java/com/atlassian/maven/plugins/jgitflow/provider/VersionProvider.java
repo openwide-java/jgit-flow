@@ -68,7 +68,14 @@ public interface VersionProvider
      *
      * @param cacheKey        The cacheKey to use when looking for versions so we don't have to loop over the reactor everytime
      * @param reactorProjects The set of reactorProjects to loop over
+     * @param includePatterns Include from dependencies matching artifacts. If null or empty, only version from reactors projects are returned
      * @return A Map<String,String> where the key is the project/module key and the value is the version
+     */
+    Map<String, String> getOriginalVersions(ProjectCacheKey cacheKey, List<MavenProject> reactorProjects, List<String> includePatterns);
+
+    /**
+     * @see VersionProvider#getOriginalVersions(ProjectCacheKey, List, List)
+     * No extra includePatterns used ; only reactor artifacts are processed
      */
     Map<String, String> getOriginalVersions(ProjectCacheKey cacheKey, List<MavenProject> reactorProjects);
 
@@ -77,7 +84,14 @@ public interface VersionProvider
      * This method never looks up from cache.
      *
      * @param reactorProjects The set of reactorProjects to loop over
+     * @param includePatterns Include from dependencies matching artifacts. If null or empty, only version from reactors projects are returned
      * @return A Map<String,String> where the key is the project/module key and the value is the version
+     */
+    Map<String, String> getOriginalVersions(List<MavenProject> reactorProjects, List<String> includePatterns);
+
+    /**
+     * @see VersionProvider#getOriginalVersions(List, List)
+     * No extra includePatterns used ; only reactor artifacts are processed
      */
     Map<String, String> getOriginalVersions(List<MavenProject> reactorProjects);
 

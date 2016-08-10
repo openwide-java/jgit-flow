@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.jgitflow.rewrite;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.atlassian.maven.plugins.jgitflow.exception.ProjectRewriteException;
 
@@ -21,25 +22,32 @@ import static com.atlassian.maven.plugins.jgitflow.rewrite.ProjectChangeUtils.ge
 /**
  * @since version
  */
-public class ArtifactReleaseVersionChange implements ProjectChange
+public class ArtifactReleaseVersionChange<D extends Artifact, E extends D> implements ProjectChange
 {
     private static final String LF = System.getProperty("line.separator") + "  - ";
-    private final Map<String, String> originalVersions;
+    private final Map<D, String> originalVersions;
     private final Map<String, String> releaseVersions;
+    private final Set<String> reactorArtifacts;
     private final boolean updateDependencies;
     private StringBuilder workLog;
 
-    private ArtifactReleaseVersionChange(Map<String, String> originalVersions, Map<String, String> releaseVersions, boolean updateDependencies)
+    private ArtifactReleaseVersionChange(Map<D, String> originalVersions, Map<String, String> releaseVersions, Set<String> reactorArtifacts, boolean updateDependencies)
     {
         this.originalVersions = originalVersions;
         this.releaseVersions = releaseVersions;
+        this.reactorArtifacts = reactorArtifacts;
         this.updateDependencies = updateDependencies;
         this.workLog = new StringBuilder("[Update Artifact Versions]");
     }
 
+    public static ArtifactReleaseVersionChange artifactReleaseVersionChange(Map<String, String> originalVersions, Map<String, String> releaseVersions, Set<String> reactorArtifacts, boolean updateDependencies)
+    {
+        return new ArtifactReleaseVersionChange(originalVersions, releaseVersions, reactorArtifacts, updateDependencies);
+    }
+
     public static ArtifactReleaseVersionChange artifactReleaseVersionChange(Map<String, String> originalVersions, Map<String, String> releaseVersions, boolean updateDependencies)
     {
-        return new ArtifactReleaseVersionChange(originalVersions, releaseVersions, updateDependencies);
+        return new ArtifactReleaseVersionChange(originalVersions, releaseVersions, null, updateDependencies);
     }
 
     @Override
@@ -218,7 +226,8 @@ public class ArtifactReleaseVersionChange implements ProjectChange
                             {
                                 if (!mappedVersion.matches("\\$\\{project.+\\}")
                                         && !mappedVersion.matches("\\$\\{pom.+\\}")
-                                        && !"${version}".equals(mappedVersion))
+                                        && !"${version}".equals(mappedVersion)
+                                        && (reactorArtifacts == null || reactorArtifacts.contains(artifactKey)))
                                 {
                                     throw new ProjectRewriteException("The artifact (" + artifactKey + ") requires a "
                                             + "different version (" + mappedVersion + ") than what is found ("

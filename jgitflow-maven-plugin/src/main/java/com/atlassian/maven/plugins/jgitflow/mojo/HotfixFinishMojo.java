@@ -121,6 +121,14 @@ public class HotfixFinishMojo extends AbstractJGitFlowMojo
     @Parameter(defaultValue = "false", property = "consistentProjectVersions")
     protected boolean consistentProjectVersions = false;
 
+    /**
+     * Patterns to select artifacts that are version-protected during pom merging
+     * (this behavior is done by updating pom on pre-merge to set version from merge-origin branch, then restore
+     * original versions post-merge)
+     */
+    @Parameter(defaultValue = "null", property = "protectedArtifactsPatterns")
+    private String[] protectedArtifactsPatterns;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -160,7 +168,8 @@ public class HotfixFinishMojo extends AbstractJGitFlowMojo
                 .setEol(eol)
            .setHotfixFinishExtension(extensionObject)
            .setFlowInitContext(getFlowInitContext().getJGitFlowContext())
-           .setConsistentProjectVersions(consistentProjectVersions);
+           .setConsistentProjectVersions(consistentProjectVersions)
+           .setProtectedArtifactsPatterns(protectedArtifactsPatterns);
 
         try
         {

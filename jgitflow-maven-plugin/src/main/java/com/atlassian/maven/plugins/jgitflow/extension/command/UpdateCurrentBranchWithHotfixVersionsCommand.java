@@ -16,6 +16,7 @@ import com.atlassian.maven.plugins.jgitflow.provider.ContextProvider;
 import com.atlassian.maven.plugins.jgitflow.provider.VersionCacheProvider;
 import com.atlassian.maven.plugins.jgitflow.provider.VersionProvider;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -49,7 +50,7 @@ public class UpdateCurrentBranchWithHotfixVersionsCommand implements ExtensionCo
         {
             ReleaseContext ctx = contextProvider.getContext();
 
-            versionCacheProvider.cacheCurrentBranchVersions();
+            versionCacheProvider.cacheCurrentBranchVersions(Arrays.asList(ctx.getProtectedArtifactsPatterns()));
 
             String currentName = branchHelper.getCurrentBranchName();
 

@@ -18,6 +18,7 @@ import com.atlassian.maven.plugins.jgitflow.provider.JGitFlowProvider;
 import com.atlassian.maven.plugins.jgitflow.provider.ReactorProjectsProvider;
 import com.atlassian.maven.plugins.jgitflow.provider.VersionCacheProvider;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -66,7 +67,7 @@ public class UpdateDevelopPomsWithMasterVersion implements ExtensionCommand
 
             //cache the current develop versions
             flow.git().checkout().setName(flow.getDevelopBranchName()).call();
-            versionCacheProvider.cacheCurrentBranchVersions();
+            versionCacheProvider.cacheCurrentBranchVersions(Arrays.asList(ctx.getProtectedArtifactsPatterns()));
 
             pomUpdater.copyPomVersionsFromProject(masterProjects, developProjects);
 

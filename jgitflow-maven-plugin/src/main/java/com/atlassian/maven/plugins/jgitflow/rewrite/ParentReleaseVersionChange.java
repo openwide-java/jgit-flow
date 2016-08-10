@@ -3,6 +3,7 @@ package com.atlassian.maven.plugins.jgitflow.rewrite;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.atlassian.maven.plugins.jgitflow.exception.ProjectRewriteException;
 
@@ -22,20 +23,27 @@ public class ParentReleaseVersionChange implements ProjectChange
 {
     private final Map<String, String> originalVersions;
     private final Map<String, String> releaseVersions;
+    private final Set<String> reactorArtifacts;
     private final boolean consistentProjectVersions;
     private final List<String> workLog;
 
-    private ParentReleaseVersionChange(Map<String, String> originalVersions, Map<String, String> releaseVersions, boolean consistentProjectVersions)
+    private ParentReleaseVersionChange(Map<String, String> originalVersions, Map<String, String> releaseVersions, Set<String> reactorArtifacts, boolean consistentProjectVersions)
     {
         this.originalVersions = originalVersions;
         this.releaseVersions = releaseVersions;
+        this.reactorArtifacts = reactorArtifacts;
         this.consistentProjectVersions = consistentProjectVersions;
         this.workLog = new ArrayList<String>();
     }
 
+    public static ParentReleaseVersionChange parentReleaseVersionChange(Map<String, String> originalVersions, Map<String, String> releaseVersions, Set<String> reactorArtifacts, boolean consistentProjectVersions)
+    {
+        return new ParentReleaseVersionChange(originalVersions, releaseVersions, reactorArtifacts, consistentProjectVersions);
+    }
+
     public static ParentReleaseVersionChange parentReleaseVersionChange(Map<String, String> originalVersions, Map<String, String> releaseVersions, boolean consistentProjectVersions)
     {
-        return new ParentReleaseVersionChange(originalVersions, releaseVersions, consistentProjectVersions);
+        return new ParentReleaseVersionChange(originalVersions, releaseVersions, null, consistentProjectVersions);
     }
 
     @Override
@@ -61,7 +69,8 @@ public class ParentReleaseVersionChange implements ProjectChange
 
                 if (null == parentVersion)
                 {
-                    if (parent.getVersion().equals(originalVersions.get(parentId)))
+                    if ((reactorArtifacts == null || reactorArtifacts.contains(parentId))
+                            && parent.getVersion().equals(originalVersions.get(parentId)))
                     {
                         throw new ProjectRewriteException("Release version for parent " + parent.getName() + " was not found");
                     }

@@ -1,7 +1,6 @@
 package com.atlassian.maven.plugins.jgitflow.helper;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.atlassian.maven.plugins.jgitflow.ReleaseContext;
 import com.atlassian.maven.plugins.jgitflow.VersionType;
@@ -16,7 +15,9 @@ import com.atlassian.maven.plugins.jgitflow.rewrite.ProjectRewriter;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -148,8 +149,8 @@ public class DefaultPomUpdater extends AbstractLogEnabled implements PomUpdater
 
         ReleaseContext ctx = contextProvider.getContext();
 
-        Map<String, String> originalVersions = versionProvider.getOriginalVersions(projectsToUpdate);
-        Map<String, String> versionsToCopy = versionProvider.getOriginalVersions(projectsToCopy);
+        Map<String, String> originalVersions = versionProvider.getOriginalVersions(projectsToUpdate, Arrays.asList(ctx.getProtectedArtifactsPatterns()));
+        Map<String, String> versionsToCopy = versionProvider.getOriginalVersions(projectsToCopy, Arrays.asList(ctx.getProtectedArtifactsPatterns()));
 
         doUpdate(projectsToUpdate, originalVersions, versionsToCopy, ctx.isUpdateDependencies(), ctx.isConsistentProjectVersions());
     }
@@ -160,7 +161,7 @@ public class DefaultPomUpdater extends AbstractLogEnabled implements PomUpdater
         getLogger().info("copying pom versions...");
 
         ReleaseContext ctx = contextProvider.getContext();
-        Map<String, String> originalVersions = versionProvider.getOriginalVersions(projectsToUpdate);
+        Map<String, String> originalVersions = versionProvider.getOriginalVersions(projectsToUpdate, Arrays.asList(ctx.getProtectedArtifactsPatterns()));
 
         doUpdate(projectsToUpdate, originalVersions, versionsToCopy, ctx.isUpdateDependencies(), ctx.isConsistentProjectVersions());
     }
@@ -274,12 +275,28 @@ public class DefaultPomUpdater extends AbstractLogEnabled implements PomUpdater
         {
             getLogger().info("turn on debug logging with -X to see exact changes");
         }
+
+        // fallback on current version if missing finalVersions
+        Map<String, String> finalVersionsOrOriginalDefault = Maps.newHashMap();
+        finalVersionsOrOriginalDefault.putAll(finalVersions);
+        for (Map.Entry<String, String> entry : originalVersions.entrySet()) {
+            if (!finalVersions.containsKey(entry.getKey())) {
+                finalVersionsOrOriginalDefault.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        ReleaseContext ctx = contextProvider.getContext();
+        Set<String> reactorArtifacts = new HashSet<String>();
+        for (MavenProject project : reactorProjects)
+        {
+            reactorArtifacts.add(ArtifactUtils.versionlessKey(project.getGroupId(), project.getArtifactId()));
+        }
         for (MavenProject project : reactorProjects)
         {
             ProjectChangeset changes = new ProjectChangeset()
-                    .with(parentReleaseVersionChange(originalVersions, finalVersions, consistentProjectVersions))
-                    .with(projectReleaseVersionChange(finalVersions, consistentProjectVersions))
-                    .with(artifactReleaseVersionChange(originalVersions, finalVersions, updateDependencies));
+                    .with(parentReleaseVersionChange(originalVersions, finalVersionsOrOriginalDefault, reactorArtifacts, consistentProjectVersions))
+                    .with(projectReleaseVersionChange(finalVersionsOrOriginalDefault, consistentProjectVersions))
+                    .with(artifactReleaseVersionChange(originalVersions, finalVersionsOrOriginalDefault, reactorArtifacts, updateDependencies));
             try
             {
                 getLogger().info("(" + fullBranchName + ") updating pom for " + project.getName() + "...");

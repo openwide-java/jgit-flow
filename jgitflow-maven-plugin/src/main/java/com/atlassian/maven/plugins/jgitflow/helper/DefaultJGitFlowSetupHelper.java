@@ -13,6 +13,7 @@ import com.atlassian.maven.plugins.jgitflow.provider.JGitFlowProvider;
 import com.atlassian.maven.plugins.jgitflow.util.ConsoleCredentialsProvider;
 import com.atlassian.maven.plugins.jgitflow.util.SshCredentialsProvider;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
 import org.apache.maven.execution.RuntimeInformation;
@@ -184,6 +185,8 @@ public class DefaultJGitFlowSetupHelper extends AbstractLogEnabled implements JG
                 .debugText(shortName, "    squash: " + ctx.isSquash())
                 .debugText(shortName, "    update dependencies: " + ctx.isUpdateDependencies())
                 .debugText(shortName, "    use release profile: " + ctx.isUseReleaseProfile())
+                .debugText(shortName, "    protected artifacts: " +
+                        Joiner.on(",").join(ctx.getProtectedArtifactsPatterns()))
                 .debugText(shortName, JGitFlowReporter.HR);
 
             JGitFlowReporter.get().flush();

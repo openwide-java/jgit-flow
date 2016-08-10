@@ -8,6 +8,7 @@ import com.atlassian.jgitflow.core.exception.JGitFlowException;
 import com.atlassian.maven.plugins.jgitflow.exception.ReactorReloadException;
 import com.atlassian.maven.plugins.jgitflow.helper.BranchHelper;
 
+import com.google.common.collect.Lists;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -25,12 +26,17 @@ public class VersionCacheProvider
     @Requirement
     VersionProvider versionProvider;
 
-    public Map<String, String> cacheCurrentBranchVersions() throws GitAPIException, JGitFlowException, ReactorReloadException, IOException
+    public Map<String, String> cacheCurrentBranchVersions(List<String> includePatterns) throws GitAPIException, JGitFlowException, ReactorReloadException, IOException
     {
         List<MavenProject> projects = branchHelper.getProjectsForCurrentBranch();
-        INSTANCE.cache = versionProvider.getOriginalVersions(projects);
+        INSTANCE.cache = versionProvider.getOriginalVersions(projects, includePatterns);
 
         return INSTANCE.cache;
+    }
+
+    public Map<String, String> cacheCurrentBranchVersions() throws GitAPIException, JGitFlowException, ReactorReloadException, IOException
+    {
+        return cacheCurrentBranchVersions(null);
     }
 
     public Map<String, String> getCachedVersions()

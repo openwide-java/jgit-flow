@@ -117,6 +117,14 @@ public class ReleaseFinishMojo extends AbstractJGitFlowMojo
     @Parameter(property = "goals", defaultValue = "clean deploy")
     private String goals = "";
 
+    /**
+     * Patterns to select artifacts that are version-protected during pom merging
+     * (this behavior is done by updating pom on pre-merge to set version from merge-origin branch, then restore
+     * original versions post-merge)
+     */
+    @Parameter(defaultValue = "null", property = "protectedArtifactsPatterns")
+    private String[] protectedArtifactsPatterns;
+
     @Component(hint = "release")
     FlowReleaseManager releaseManager;
 
@@ -167,7 +175,8 @@ public class ReleaseFinishMojo extends AbstractJGitFlowMojo
            .setReleaseFinishExtension(extensionObject)
            .setFlowInitContext(getFlowInitContext().getJGitFlowContext())
                 .setEol(eol)
-           .setConsistentProjectVersions(consistentProjectVersions);
+           .setConsistentProjectVersions(consistentProjectVersions)
+           .setProtectedArtifactsPatterns(protectedArtifactsPatterns);
 
         try
         {
