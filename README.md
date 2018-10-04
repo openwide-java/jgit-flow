@@ -1,3 +1,7 @@
+Discontinued
+============
+This repository is no longer actively maintained. Please take a look at the [original repo](https://bitbucket.org/atlassian/jgit-flow).
+
 # JGit-Flow
 
 **Current Version: 1.0-m5.1**
